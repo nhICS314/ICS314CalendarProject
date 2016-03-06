@@ -1,13 +1,25 @@
-package iCal;
+package ics314;
 
 public class Event {
-	private	String version, clas, comment, timezone, pro, id, start, end, stamp, sum;
-	private float geograph;
+	private	String classification, comment, timezone, pro, id, start, end, stamp, sum, geograph, version;
+
+	public Event(){
+		classification = "CLASS:PUBLIC\r\n";
+		comment = "";
+		timezone = "";
+		version = "VERSION:2.0\r\n";
+		pro = "PRODID://ICS Team Project/Calendar/v1.0//EN\r\n";
+		id = "UID:19970610T172345Z-AF23B2@example.com\r\n";
+		stamp = "DTSTAMP:19970610T172345Z\r\n";
+		start = "DTSTART:19970714T170000Z\r\n";
+		end = "DTEND:19970715T040000Z\r\n";
+		sum = "SUMMARY:Beach Day\r\n";
+		geograph = "";
+	}
 
 	//constructor
-	Event(ver, cla, comnt, tzid, prodid, uid, strt, nd, stmp, sm, geo){
-		version = ver;
-		class = cla;
+	public Event(String cla, String comnt, String tzid, String prodid, String uid, String strt, String nd, String stmp, String sm, String geo){
+		classification = cla;
 		comment = comnt;
 		timezone = tzid;
 		pro = prodid;
@@ -17,14 +29,12 @@ public class Event {
 		stamp = stmp;
 		sum = sm;
 		geograph = geo;
-	};
+	}
 
 	//accessors
-	public String getver() {
-		return version;
-	}
+
 	public String getcla() {
-		return class;
+		return classification;
 	}
 	public String getcomnt() {
 		return comment;
@@ -50,42 +60,47 @@ public class Event {
 	public String getsm() {
 		return sum;
 	}
-	public float getgeo() {
+	public String getgeo() {
 		return geograph;
+	}
+	public String getVersion(){
+		return version;
 	}
 
 	//mutators
-	void setver(String ver){
-		version = ver;
+
+	public void setcla(String cla){
+		classification = cla;
 	}
-	void setcla(String cla){
-		class = cla;
-	}
-	void setcomnt(String comnt){
+	public void setcomnt(String comnt){
 		comment = comnt;
 	}
-	void settzid(String tzid){
+	public void settzid(String tzid){
 		timezone = tzid;
 	}
-	void setprodid(String prodid){
+	public void setprodid(String prodid){
 		pro = prodid;
 	}
-	void setuid(String uid){
+	public void setuid(String uid){
 		id = uid;
 	}
-	void setstrt(String strt){
+	public void setstrt(String strt){
 		start = strt;
 	}
-	void setnd(String nd){
+	public void setnd(String nd){
 		end = nd;
 	}
-	void setstmp(String stmp){
+	public void setstmp(String stmp){
 		stamp = stmp;
 	}
-	void setsm(String sm){
+	public void setsm(String sm){
 		sum = sm;
 	}
-	void setgeo(float geo){
+	public void setgeo(String geo){
 		geograph = geo;
 	}
+	public void setVersion(String vers){
+		version = vers;
+	}
+	
 }

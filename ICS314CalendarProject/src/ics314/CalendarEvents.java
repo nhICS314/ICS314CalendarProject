@@ -12,28 +12,40 @@ import java.io.IOException;
  */
 class CalendarEvents {
 	public static void main(String[] args) {
+		
+		Interface next = new Interface();
+		Event e = new Event();
+		next.askForClassification(e);
+		next.askForDescription(e);
+		next.getDStamp(e);
+		next.askForTimeZone(e);
+		next.askForStartTime(e);
+		next.askForEndTime(e);
+		next.askForLocation(e);
+		
 		try {
-			String fileName = "mynewfile.ics";
+			String fileName = next.name + ".ics";
 
 			File file = new File(fileName);
 			
 			//Check if file was created
 			if (file.createNewFile()) {
-				System.out.println("The .ics file has been created!");
+				System.out.println("This .ics file has been created!");
 			} else {
-				System.out.println("The .ics file already exists.");
+				System.out.println("This .ics file already exists.");
 			}
 
 			// String to write to the file
 			String toWrite = "BEGIN:VCALENDAR\r\n" 
-					+ "VERSION:2.0\r\n"
-					+ "PRODID:-//hacksw/handcal//NONSGML v1.0//EN\r\n"
+					+ e.getVersion()
+					+ e.getprodid()
 					+ "BEGIN:VEVENT\r\n"
-					+ "UID:19970610T172345Z-AF23B2@example.com\r\n"
-					+ "DTSTAMP:19970610T172345Z\r\n"
-					+ "DTSTART:19970714T170000Z\r\n" 
-					+ "DTEND:19970715T040000Z\r\n"
-					+ "SUMMARY:Beach Day\r\n" 
+					+ e.getuid()
+					+ e.getstmp()
+					+ e.getstrt() 
+					+ e.getnd()
+					+ e.getsm()
+					+ e.getgeo()
 					+ "END:VEVENT\r\n"
 					+ "END:VCALENDAR\r\n";
 			
@@ -47,8 +59,8 @@ class CalendarEvents {
 			//Close the buffer
 			bWriter.close();
 
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException err) {
+			err.printStackTrace();
 		}
 	}
 }
