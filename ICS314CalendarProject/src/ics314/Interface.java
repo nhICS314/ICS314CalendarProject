@@ -31,7 +31,7 @@ public class Interface {
 	}
 	
 	//creates geo position for event using latitude and longitude coordinates
-	public void askForLocation(Event event) {
+	public void askForLocation(Event event) { //does not check for exactly 6 digits after decimal place!
 		float latitude = 181;
 		float longitude = 181;
 		while (latitude < -180 || latitude > 180) {
@@ -94,7 +94,7 @@ public class Interface {
 	
 	public void askForStartTime(Event event) {
 		String month = "";
-		String day = "";
+		String day = ""; 
 		String year = "";
 		String time = "";
 		String start = "";
