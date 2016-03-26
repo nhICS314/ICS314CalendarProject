@@ -13,7 +13,6 @@ public class Interface {
 	// sets Classification to user specification
 	public void askForClassification(Event event) {
 		String classification = "";
-		//Scanner scan = new Scanner(System.in);
 		while (classification == "") {
 			System.out.println("Choose the Classification level for the event");
 			System.out.print("Enter one of the following, PUBLIC, PRIVATE, or CONFIDENTIAL then press 'ENTER':  ");
@@ -29,34 +28,37 @@ public class Interface {
 				System.out.println("That is not a valid entry.");
 			}
 		}
-	//	scan.close();
 	}
 	
 	//creates geo position for event using latitude and longitude coordinates
-	public void askForLocation(Event event) {
-		float latitude = 0;
-		float longitude = 0;
-		//Scanner scan = new Scanner(System.in);
-		while (latitude == 0 || longitude == 0) {
+	public void askForLocation(Event event) { //does not check for exactly 6 digits after decimal place!
+		float latitude = 181;
+		float longitude = 181;
+		while (latitude < -180 || latitude > 180) {
 			System.out.print("Enter the latitude up to 6 decimal places for the event then press 'ENTER':  ");
 			latitude = scan.nextFloat();
+			if(latitude < -180 || latitude > 180) {
+				System.out.println("The latitude must be within the range of +/-180 and up to 6 decimals.");
+			}
+		}
+		while (longitude < -180 || longitude > 180) {
 			System.out.print("Enter the longitude up to 6 decimal places for the event then press 'ENTER':  ");
 			longitude = scan.nextFloat();
+			if(longitude < -180 || longitude > 180) {
+				System.out.println("The longitude must be within the range of +/-180 and up to 6 decimals.");
 			}
+		}
 		event.setgeo("GEO:" + latitude + ";" + longitude + "\r\n");
-		//scan.close();
 	}
 	
 	public void askForDescription(Event event) {
 		String description = "";
-		//Scanner scan = new Scanner(System.in);
 		while (description.equals("")) {
 			System.out.print("Enter the name of the event then press 'ENTER':  ");
 			description = scan.nextLine();
 			}
 		event.setsm("SUMMARY:" + description + "\r\n");
 		name = description;
-	//	scan.close();
 	}
 	
 	public static String findTimeZone(String timezone){
@@ -82,37 +84,60 @@ public class Interface {
 	public void askForTimeZone(Event event){
 		String timezone = "";
 		String tZID = "";
-		//Scanner scan = new Scanner(System.in);
-		while (timezone.equals("")){
+		while (tZID.equals("")){
 			System.out.print("Which timezone is this taking place-USA only(example: HST, PST):  ");
 			timezone = scan.next();
+			tZID = Interface.findTimeZone(timezone);
 		}
-		tZID = Interface.findTimeZone(timezone);
 		event.settzid(tZID);
-		//scan.close();
 	}
 	
 	public void askForStartTime(Event event) {
 		String month = "";
-		String day = "";
+		String day = ""; 
 		String year = "";
-		String start = "";
 		String time = "";
-		//Scanner scan = new Scanner(System.in);
-		while (month.equals("") || day.equals("")  || year.equals("")  || time.equals("")) {
-			System.out.println("Create the start date and time for the event.");
+		String start = "";
+		Integer mnth = null, dy = null, yr = null, tm = null;
+		System.out.println("Create the start date and time for the event.");
+		while (mnth == null || mnth < 1 || mnth > 12) {
 			System.out.print("Enter the month for the event using two digits (ex: 07):  ");
 			month = scan.next();
+			try {
+				mnth = Integer.parseInt(month);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
+		while (dy == null || dy < 1 || dy > 31) {
 			System.out.print("Enter the day of the month for the event using two digits (ex: 01):  ");
 			day = scan.next();
+			try {
+				dy = Integer.parseInt(day);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
+		while (yr == null || yr < 1000 || yr > 9999) {
 			System.out.print("Enter the year for the event using 4 digits (ex: 2012):  ");
 			year = scan.next();
+			try {
+				yr = Integer.parseInt(year);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
+		while (tm == null || tm < 0 || tm > 2400) {
 			System.out.print("Enter the start time for the event in military time do NOT use colons (ex: enter 1400 instead of 2pm):  ");
 			time = scan.next();
+			try {
+				tm = Integer.parseInt(time);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
 			}
+		}
 		start = year + month + day + "T" + time + "00";
 		event.setstrt("DTSTART;TZID" + event.gettzid() + start + "\r\n");
-		//scan.close();
 	}
 	
 	public void askForEndTime(Event event) {
@@ -121,21 +146,46 @@ public class Interface {
 		String year = "";
 		String end = "";
 		String time = "";
-		//Scanner scan = new Scanner(System.in);
-		while (month.equals("") || day.equals("") || year.equals("") || time.equals("")) {
-			System.out.println("Create the end date and time for the event.");
+		Integer mnth = null, dy = null, yr = null, tm = null;
+		System.out.println("Create the end date and time for the event.");
+		while (mnth == null || mnth < 1 || mnth > 12) {
 			System.out.print("Enter the month for the event using two digits (ex: 07):  ");
 			month = scan.next();
+			try {
+				mnth = Integer.parseInt(month);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
+		while (dy == null || dy < 1 || dy > 31) {
 			System.out.print("Enter the day of the month for the event using two digits (ex: 01):  ");
 			day = scan.next();
+			try {
+				dy = Integer.parseInt(day);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
+		while (yr == null || yr < 1000 || yr > 9999) {
 			System.out.print("Enter the year for the event using 4 digits (ex: 2012):  ");
 			year = scan.next();
-			System.out.print("Enter the end time for the event in military time do NOT use colons (ex: enter 1400 instead of 2pm):  ");
-			time = scan.next();
+			try {
+				yr = Integer.parseInt(year);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
 			}
+		}
+		while (tm == null || tm < 0 || tm > 2400) {
+			System.out.print("Enter the start time for the event in military time do NOT use colons (ex: enter 1400 instead of 2pm):  ");
+			time = scan.next();
+			try {
+				tm = Integer.parseInt(time);
+			} catch (NumberFormatException e) {
+				System.out.println("This is not a valid entry!");
+			}
+		}
 		end = year + month + day + "T" + time + "00";
 		event.setnd("DTEND;TZID" + event.gettzid() + end + "\r\n");
-		//scan.close();
 	}
 	
 	public void getDStamp(Event event){
@@ -144,6 +194,4 @@ public class Interface {
 		Date date = new Date();
 		event.setstmp("DTSTAMP:" + dateFormat.format(date)+ "T" + timeFormat.format(date) + "Z\r\n");
 	}
-
-	//scan.close();
 }
