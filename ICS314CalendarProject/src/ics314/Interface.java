@@ -176,7 +176,7 @@ public class Interface {
 			}
 		}
 		while (tm == null || tm < 0 || tm > 2400) {
-			System.out.print("Enter the start time for the event in military time do NOT use colons (ex: enter 1400 instead of 2pm):  ");
+			System.out.print("Enter the end time for the event in military time do NOT use colons (ex: enter 1400 instead of 2pm):  ");
 			time = scan.next();
 			try {
 				tm = Integer.parseInt(time);
