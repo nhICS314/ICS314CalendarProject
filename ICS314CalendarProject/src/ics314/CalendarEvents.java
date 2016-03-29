@@ -12,55 +12,70 @@ import java.io.IOException;
  */
 class CalendarEvents {
 	public static void main(String[] args) {
-		
-		Interface next = new Interface();
-		Event e = new Event();
-		next.askForClassification(e);
-		next.askForDescription(e);
-		next.getDStamp(e);
-		next.askForTimeZone(e);
-		next.askForStartTime(e);
-		next.askForEndTime(e);
-		next.askForLocation(e);
-		
-		try {
-			String fileName = next.name + ".ics";
+		boolean addEvent = true;
+		Calendar c = new Calendar();
+		Event[] tempEvents = new Event[1000];
 
+		Interface next = new Interface();
+
+		next.askForCalendarName(c);
+
+		int eventIndex = 0;
+		while (addEvent) {
+			Event e = new Event();
+			next.askForClassification(e);
+			next.askForDescription(e);
+			next.getDStamp(e);
+			next.askForTimeZone(e);
+			next.askForStartTime(e);
+			next.askForEndTime(e);
+			next.askForLocation(e);
+
+			tempEvents[eventIndex] = e;
+			addEvent = next.askForAddAnother();
+			eventIndex++;
+		}// end while
+
+		c.setEvents(tempEvents);
+		Event[] events = c.getEvents();
+
+		try {
+
+			String fileName = c.getName() + ".ics";
 			File file = new File(fileName);
-			
-			//Check if file was created
+
+			// Check if file was created
 			if (file.createNewFile()) {
 				System.out.println("This .ics file has been created!");
 			} else {
 				System.out.println("This .ics file already exists.");
 			}
 
-			// String to write to the file
-			String toWrite = "BEGIN:VCALENDAR\r\n" 
-					+ e.getVersion()
-					+ e.getprodid()
-					+ "BEGIN:VEVENT\r\n"
-					+ e.getuid()
-					+ e.getstmp()
-					+ e.getstrt() 
-					+ e.getnd()
-					+ e.getsm()
-					+ e.getgeo()
-					+ "END:VEVENT\r\n"
-					+ "END:VCALENDAR\r\n";
-			
-			//Create file writer & buffer writer
+			String calWrite = "BEGIN:VCALENDAR\r\n";
+			calWrite += c.getVersion();
+			calWrite += c.getProdid();
+			String eventsWrite = "";
+			for (int i = 0; i < eventIndex; i++) {
+				// String to write to the file
+				eventsWrite += "BEGIN:VEVENT\r\n" + events[i].getuid()
+						+ events[i].getstmp() + events[i].getstrt() + events[i].getnd()
+						+ events[i].getsm() + events[i].getgeo() + "END:VEVENT\r\n";
+			}// end for
+			calWrite = calWrite + eventsWrite + "END:VCALENDAR\r\n";
+
+			// Create file writer & buffer writer
 			FileWriter fWriter = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bWriter = new BufferedWriter(fWriter);
-			
-			//Write the file
-			bWriter.write(toWrite);
-			
-			//Close the buffer
+
+			// Write the file
+			bWriter.write(calWrite);
+
+			// Close the buffer
 			bWriter.close();
 
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
+
 	}
 }

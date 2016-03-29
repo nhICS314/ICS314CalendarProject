@@ -10,6 +10,23 @@ public class Interface {
 	public String name;
 	Scanner scan = new Scanner(System.in);
 
+	//Asks if you want to add an additional event
+	public boolean askForAddAnother() {
+		boolean addEvent = false;
+		boolean unknownResponse = false;
+		String description = "";
+		while (description.equals("") || unknownResponse) {
+			System.out.print("Did you want to add another event? Type YES or NO then press 'ENTER':  ");			
+			description = scan.nextLine();
+			if(description.equals("YES")){
+				addEvent = true;
+			}else{
+				addEvent = false;
+			}
+		}
+		return addEvent;
+	}	
+	
 	// sets Classification to user specification
 	public void askForClassification(Event event) {
 		String classification = "";
@@ -60,6 +77,15 @@ public class Interface {
 		event.setsm("SUMMARY:" + description + "\r\n");
 		name = description;
 	}
+	
+	public void askForCalendarName(Calendar myCalendar) {
+		String tempName = "";
+		while (tempName.equals("")) {
+			System.out.print("Enter the name of the calendar file then press 'ENTER':  ");
+			tempName = scan.nextLine();
+		}
+		myCalendar.setName(tempName); 
+	}	
 	
 	public static String findTimeZone(String timezone){
 		String zoneID = "";
