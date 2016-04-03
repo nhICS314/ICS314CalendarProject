@@ -15,6 +15,7 @@ class CalendarEvents {
 		boolean addEvent = true;
 		Calendar c = new Calendar();
 		Event[] tempEvents = new Event[1000];
+		Event first = new Event();
 
 		Interface next = new Interface();
 
@@ -30,8 +31,13 @@ class CalendarEvents {
 			next.askForStartTime(e);
 			next.askForEndTime(e);
 			next.askForLocation(e);
-
+			// Compute Great Circle Distance if multiple events
+			if(eventIndex >= 2) {
+				next.greatCircleDist(first, e, c); //set the comment to first event
+			}
 			tempEvents[eventIndex] = e;
+			if(eventIndex == 0)
+				first = e;
 			addEvent = next.askForAddAnother();
 			eventIndex++;
 		}// end while
@@ -50,16 +56,16 @@ class CalendarEvents {
 			} else {
 				System.out.println("This .ics file already exists.");
 			}
-
+			
 			String calWrite = "BEGIN:VCALENDAR\r\n";
 			calWrite += c.getVersion();
 			calWrite += c.getProdid();
 			String eventsWrite = "";
 			for (int i = 0; i < eventIndex; i++) {
 				// String to write to the file
-				eventsWrite += "BEGIN:VEVENT\r\n" + events[i].getuid()
+				eventsWrite += "BEGIN:VEVENT\r\n" + events[i].getcla() + events[i].getuid()
 						+ events[i].getstmp() + events[i].getstrt() + events[i].getnd()
-						+ events[i].getsm() + events[i].getgeo() + "END:VEVENT\r\n";
+						+ events[i].getsm() + events[i].getgeo() + events[i].getcomnt() + "END:VEVENT\r\n";
 			}// end for
 			calWrite = calWrite + eventsWrite + "END:VCALENDAR\r\n";
 

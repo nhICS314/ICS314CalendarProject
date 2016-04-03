@@ -4,6 +4,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.File;
 
 public class Interface {
 	
@@ -219,5 +222,74 @@ public class Interface {
 		DateFormat timeFormat = new SimpleDateFormat("HHmmss");
 		Date date = new Date();
 		event.setstmp("DTSTAMP:" + dateFormat.format(date)+ "T" + timeFormat.format(date) + "Z\r\n");
+	}
+	
+	//if more than 1 ics file to compute Great Circle Distance
+	public void greatCircleDist(Event event1, Event event2, Calendar cal) { //throws FileNotFoundException
+		String latitude1, longitude1, latitude2, longitude2, fileName = "C:/" + cal.getName() + ".ics";
+		/*
+		File file = new File(fileName);
+		FileReader rd = new FileReader(file.getAbsoluteFile());
+		BufferedReader rdr = new BufferedReader(rd);
+		FileWriter wt = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter wtr = new BufferedWriter(wt);
+		*/
+		
+		String Line = new String();
+		String current = new String();
+		int eventNum = 1, i = 0;
+		double lat1, lon1, lat2, lon2, distance, radianConverter = 3.14159/180, haversinea;
+		//obtain strings and save to latitude1, longitude1, latitude2, longitude2
+		//get to GEO line
+		/*
+		while((current = rdr.readLine()) != null) {
+			if(current.startsWith("GEO:")) {
+				Line = current;
+				break;
+			}
+		}*/
+		Line = event1.getgeo();
+		//ignore ';' from string
+		i = Line.indexOf(';');
+		latitude1 = Line.substring(4, i-1); 
+		longitude1 = Line.substring(i+1, Line.length()-1);
+		eventNum++;
+		/*
+		while((current = rdr.readLine()) != null) {
+			if(current.startsWith("GEO:")) {
+				Line = current;
+				break;
+			}
+		}*/
+		Line = event2.getgeo();
+		//ignore ';' from string
+		i = Line.indexOf(';');
+		latitude2 = Line.substring(4, i-1);
+		longitude2 = Line.substring(i+1, Line.length()-1);
+		eventNum++;
+		//rdr.close();
+		
+		//convert String to float
+		//try {
+			lat1 = Double.parseDouble(latitude1);
+		/*} catch (NumberFormatException e) {
+			System.out.println("Error with translation!");
+		}*/
+		lon1 = Double.parseDouble(longitude1);
+		lat2 = Double.parseDouble(latitude2);
+		lon2 = Double.parseDouble(longitude2);
+		lat1 = lat1 * radianConverter;
+		lon1 = lon1 * radianConverter;
+		lat2 = lat2 * radianConverter;
+		lon2 = lon2 * radianConverter;
+		
+		//compute distance
+		haversinea = Math.sin((lat1 - lat2)/2) * Math.sin((lat1 - lat2)/2) + Math.cos(lat1) * 
+					 Math.cos(lat2) * Math.sin((lon1 - lon2)/2) * Math.sin((lon1 - lon2)/2);
+		//6371000 is the earth's radius
+		distance = 6371000 * 2 * Math.atan2(Math.sqrt(haversinea), Math.sqrt(1 - haversinea));
+		
+		 //set comment; not sure if will set at all or not
+		event1.setcomnt("COMMENT:Great Circle Distance from this event to the second: " + distance + "\r\n");
 	}
 }
