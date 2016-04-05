@@ -32,7 +32,7 @@ class CalendarEvents {
 			next.askForEndTime(e);
 			next.askForLocation(e);
 			// Compute Great Circle Distance if multiple events
-			if(eventIndex >= 2) {
+			if(eventIndex >= 1) {
 				next.greatCircleDist(first, e, c); //set the comment to first event
 			}
 			tempEvents[eventIndex] = e;
