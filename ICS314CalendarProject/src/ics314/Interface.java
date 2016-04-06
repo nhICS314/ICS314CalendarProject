@@ -21,10 +21,14 @@ public class Interface {
 		while (description.equals("") || unknownResponse) {
 			System.out.print("Did you want to add another event? Type YES or NO then press 'ENTER':  ");			
 			description = scan.nextLine();
-			if(description.equals("YES")){
+			if(description.equalsIgnoreCase("YES")){
 				addEvent = true;
-			}else{
+				unknownResponse = false;
+			}else if(description.equalsIgnoreCase("no")){
 				addEvent = false;
+				unknownResponse = false;
+			}else{
+				unknownResponse = true;
 			}
 		}
 		return addEvent;
@@ -68,6 +72,7 @@ public class Interface {
 				System.out.println("The longitude must be within the range of +/-180 and up to 6 decimals.");
 			}
 		}
+		scan.nextLine();  //clears buffer
 		event.setgeo("GEO:" + latitude + ";" + longitude + "\r\n");
 	}
 	
@@ -235,7 +240,7 @@ public class Interface {
 		BufferedWriter wtr = new BufferedWriter(wt);
 		*/
 		
-		String Line = new String();
+		String line = new String();
 		String current = new String();
 		int eventNum = 1, i = 0;
 		double lat1, lon1, lat2, lon2, distance, radianConverter = 3.14159/180, haversinea;
@@ -248,11 +253,11 @@ public class Interface {
 				break;
 			}
 		}*/
-		Line = event1.getgeo();
+		line = event1.getgeo();
 		//ignore ';' from string
-		i = Line.indexOf(';');
-		latitude1 = Line.substring(4, i-1); 
-		longitude1 = Line.substring(i+1, Line.length()-1);
+		i = line.indexOf(';');
+		latitude1 = line.substring(4, i-1); 
+		longitude1 = line.substring(i+1, line.length()-1);
 		eventNum++;
 		/*
 		while((current = rdr.readLine()) != null) {
@@ -261,11 +266,11 @@ public class Interface {
 				break;
 			}
 		}*/
-		Line = event2.getgeo();
+		line = event2.getgeo();
 		//ignore ';' from string
-		i = Line.indexOf(';');
-		latitude2 = Line.substring(4, i-1);
-		longitude2 = Line.substring(i+1, Line.length()-1);
+		i = line.indexOf(';');
+		latitude2 = line.substring(4, i-1);
+		longitude2 = line.substring(i+1, line.length()-1);
 		eventNum++;
 		//rdr.close();
 		
