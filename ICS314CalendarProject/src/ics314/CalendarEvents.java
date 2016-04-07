@@ -4,26 +4,36 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 
  * @author Nicole, Sammy, and Joseph
  * 
  */
-class CalendarEvents {
-	public static void main(String[] args) {
-		boolean addEvent = true;
-		Calendar c = new Calendar();
-		Event[] tempEvents = new Event[1000];
-		Event first = new Event();
 
+
+class CalendarEvents {
+	public static void main(String[] args) throws IOException {
+		Interface next = new Interface();
+		boolean updateDistances = next.askToUpdateDistances();
+						
+		if(updateDistances){
+			updateDistances();
+		} else {
+			writeEventFiles();
+		}
+
+
+	}
+	private static void writeEventFiles() throws IOException {
+		boolean addEvent = true;
 		Interface next = new Interface();
 
-		next.askForCalendarName(c);
-
-		int eventIndex = 0;
 		while (addEvent) {
 			Event e = new Event();
+			next.askForFileName(e);
 			next.askForClassification(e);
 			next.askForDescription(e);
 			next.getDStamp(e);
@@ -31,43 +41,28 @@ class CalendarEvents {
 			next.askForStartTime(e);
 			next.askForEndTime(e);
 			next.askForLocation(e);
-			// Compute Great Circle Distance if multiple events
-			if(eventIndex >= 2) {
-				next.greatCircleDist(first, e, c); //set the comment to first event
-			}
-			tempEvents[eventIndex] = e;
-			if(eventIndex == 0)
-				first = e;
+			
+			
+			writeIcsFile(e);
+			
 			addEvent = next.askForAddAnother();
-			eventIndex++;
-		}// end while
-
-		c.setEvents(tempEvents);
-		Event[] events = c.getEvents();
-
-		try {
-
-			String fileName = c.getName() + ".ics";
+		}// end while		
+	}
+	private static void writeIcsFile(Event e) throws IOException {
+			String fileName = e.getFileNameWithExtension();
 			File file = new File(fileName);
 
 			// Check if file was created
 			if (file.createNewFile()) {
-				System.out.println("This .ics file has been created!");
+				System.out.println("This file '" + fileName + "' has been created!");
 			} else {
-				System.out.println("This .ics file already exists.");
+				System.out.println("This file '" + fileName + "' already exists, it will be updated.");
 			}
 			
 			String calWrite = "BEGIN:VCALENDAR\r\n";
-			calWrite += c.getVersion();
-			calWrite += c.getProdid();
-			String eventsWrite = "";
-			for (int i = 0; i < eventIndex; i++) {
-				// String to write to the file
-				eventsWrite += "BEGIN:VEVENT\r\n" + events[i].getcla() + events[i].getuid()
-						+ events[i].getstmp() + events[i].getstrt() + events[i].getnd()
-						+ events[i].getsm() + events[i].getgeo() + events[i].getcomnt() + "END:VEVENT\r\n";
-			}// end for
-			calWrite = calWrite + eventsWrite + "END:VCALENDAR\r\n";
+			calWrite +=		"VERSION:2.0\r\n";
+			calWrite +=	 "PRODID://ICS Team Project/Calendar/v1.0//EN\r\n";
+			calWrite = calWrite + e.getString() + "END:VCALENDAR\r\n";
 
 			// Create file writer & buffer writer
 			FileWriter fWriter = new FileWriter(file.getAbsoluteFile());
@@ -79,9 +74,31 @@ class CalendarEvents {
 			// Close the buffer
 			bWriter.close();
 
-		} catch (IOException err) {
-			err.printStackTrace();
-		}
 
+	}
+	public static void updateDistances() throws IOException{
+
+		Interface next = new Interface();
+		ArrayList<File> icsFiles = next.askForDirectoryOfIcsFiles();
+		Event[] eventArray = new Event[icsFiles.size()];
+		for (int i = 0; i < icsFiles.size(); i++){
+			File currentIcsFile = icsFiles.get(i);
+			Event e = new Event (currentIcsFile);
+			eventArray[i]=e;
+		}
+	
+		Arrays.sort(eventArray); // uses the comparable in Event to sort
+
+		// Compute Great Circle Distance if multiple events
+		for (int i = 1; i< eventArray.length;i++){
+			Event previousEvent = eventArray[i-1];
+			Event currentEvent = eventArray[i];
+			
+			 //set the comment to first event
+			next.greatCircleDist(previousEvent, currentEvent);
+			
+			writeIcsFile(previousEvent);
+		}
+				
 	}
 }

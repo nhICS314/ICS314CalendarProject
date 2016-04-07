@@ -11,6 +11,6 @@ public class EventTest {
 		String comment = "Fun in the Sun!";
 		Event beach = new Event();
 		beach.setcomnt(comment); //input Fun in the Sun!
-		assertEquals("Fun in the Sun!", beach.getcomnt()); //expect to receive Fun in the Sun!
+		assertEquals("Fun in the Sun!", beach.getComment()); //expect to receive Fun in the Sun!
 	}
 }

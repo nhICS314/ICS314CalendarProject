@@ -2,6 +2,7 @@ package ics314;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 import java.io.BufferedReader;
@@ -13,7 +14,41 @@ public class Interface {
 	public String name;
 	Scanner scan = new Scanner(System.in);
 
+	public ArrayList<File> askForDirectoryOfIcsFiles(){
+		
+		boolean noFilesFound = false;
+		String inputDirectory = "";
+		while (inputDirectory.equals("") || noFilesFound) {
+			System.out.print("Update ICS files with Geo Comments. Type the full directory path to do so, or NO to quit.  Then press 'ENTER':  ");			
+			inputDirectory = scan.nextLine();
+			
+			if(inputDirectory.equalsIgnoreCase("no")){
+				System.exit(0);
+			}
+		}
+		
+		File directory = new File(inputDirectory);
+		if (!directory.isDirectory()){
+			System.out.println("ERROR.  " + directory + " is not a directory");
+			System.exit(0);
+		} 
+		
+		File[] allFiles = directory.listFiles();
+		ArrayList<File> fileList = new ArrayList<File>();
+		for (File file: allFiles){
+			if (file.isFile()){
+				if (file.getName().endsWith(".ics")){
+					fileList.add(file);
+				}
+			}
+		}
+		
+		return fileList;
+		
+	}
+	
 	//Asks if you want to add an additional event
+	
 	public boolean askForAddAnother() {
 		boolean addEvent = false;
 		boolean unknownResponse = false;
@@ -33,6 +68,26 @@ public class Interface {
 		}
 		return addEvent;
 	}	
+	
+	public boolean askToUpdateDistances() {
+		boolean updateDistances = false;
+		boolean unknownResponse = false;
+		String description = "";
+		while (description.equals("") || unknownResponse) {
+			System.out.print("Did you want to update distances in existing ICS files? Type YES or NO. NO will let you create ICS files  ");			
+			description = scan.nextLine();
+			if(description.equalsIgnoreCase("YES")){
+				updateDistances = true;
+				unknownResponse = false;
+			}else if(description.equalsIgnoreCase("no")){
+				updateDistances = false;
+				unknownResponse = false;
+			}else{
+				unknownResponse = true;
+			}
+		}
+		return updateDistances;
+	}
 	
 	// sets Classification to user specification
 	public void askForClassification(Event event) {
@@ -86,13 +141,13 @@ public class Interface {
 		name = description;
 	}
 	
-	public void askForCalendarName(Calendar myCalendar) {
+	public void askForFileName(Event e) {
 		String tempName = "";
 		while (tempName.equals("")) {
 			System.out.print("Enter the name of the calendar file then press 'ENTER':  ");
 			tempName = scan.nextLine();
 		}
-		myCalendar.setName(tempName); 
+		e.setFileName(tempName); 
 	}	
 	
 	public static String findTimeZone(String timezone){
@@ -229,57 +284,37 @@ public class Interface {
 		event.setstmp("DTSTAMP:" + dateFormat.format(date)+ "T" + timeFormat.format(date) + "Z\r\n");
 	}
 	
+//	Your system will compute the great circle distance, in statue miles and kilometers, from the location of EventN to EventNplusOne, and record that in the comment field of EventN.
+//	Similarly, your system will compute the great circle distance, in statue miles and kilometers, from the location of EventNplusOne to EventNplusTwo, and record that in the comment field of EventNplusOne.
+//	The idea is to give the user an idea how far apart their events are (can they walk? Bus? Drive? Fly?)
+//	But I said that location was optional for events. What if there is only one event? What do you do with the last event of the day? What are you going to do then? You’ll have to think about it and come up with something reasonable.
+	
 	//if more than 1 ics file to compute Great Circle Distance
-	public void greatCircleDist(Event event1, Event event2, Calendar cal) { //throws FileNotFoundException
-		String latitude1, longitude1, latitude2, longitude2, fileName = "C:/" + cal.getName() + ".ics";
-		/*
-		File file = new File(fileName);
-		FileReader rd = new FileReader(file.getAbsoluteFile());
-		BufferedReader rdr = new BufferedReader(rd);
-		FileWriter wt = new FileWriter(file.getAbsoluteFile());
-		BufferedWriter wtr = new BufferedWriter(wt);
-		*/
+	public void greatCircleDist(Event event1, Event event2) { //throws FileNotFoundException
+		String latitude1, longitude1, 
+			   latitude2, longitude2;
 		
 		String line = new String();
-		String current = new String();
-		int eventNum = 1, i = 0;
-		double lat1, lon1, lat2, lon2, distance, radianConverter = 3.14159/180, haversinea;
-		//obtain strings and save to latitude1, longitude1, latitude2, longitude2
-		//get to GEO line
-		/*
-		while((current = rdr.readLine()) != null) {
-			if(current.startsWith("GEO:")) {
-				Line = current;
-				break;
-			}
-		}*/
-		line = event1.getgeo();
+		int  i = 0;
+		double lat1, lon1, lat2, lon2, 
+			   distance, 
+			   radianConverter = 3.14159/180, 
+			   haversinea;
+	
+		line = event1.getGeo();
 		//ignore ';' from string
 		i = line.indexOf(';');
 		latitude1 = line.substring(4, i-1); 
 		longitude1 = line.substring(i+1, line.length()-1);
-		eventNum++;
-		/*
-		while((current = rdr.readLine()) != null) {
-			if(current.startsWith("GEO:")) {
-				Line = current;
-				break;
-			}
-		}*/
-		line = event2.getgeo();
+		
+		line = event2.getGeo();
 		//ignore ';' from string
 		i = line.indexOf(';');
 		latitude2 = line.substring(4, i-1);
 		longitude2 = line.substring(i+1, line.length()-1);
-		eventNum++;
-		//rdr.close();
 		
-		//convert String to float
-		//try {
 			lat1 = Double.parseDouble(latitude1);
-		/*} catch (NumberFormatException e) {
-			System.out.println("Error with translation!");
-		}*/
+		
 		lon1 = Double.parseDouble(longitude1);
 		lat2 = Double.parseDouble(latitude2);
 		lon2 = Double.parseDouble(longitude2);
@@ -295,6 +330,8 @@ public class Interface {
 		distance = 6371000 * 2 * Math.atan2(Math.sqrt(haversinea), Math.sqrt(1 - haversinea));
 		
 		 //set comment; not sure if will set at all or not
-		event1.setcomnt("COMMENT:Great Circle Distance from this event to the second: " + distance + "\r\n");
+		event1.setcomnt("COMMENT:Great Circle Distance from this event to the next: " + distance + "\r\n");
 	}
+
+	
 }
