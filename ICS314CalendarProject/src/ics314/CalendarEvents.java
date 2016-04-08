@@ -79,6 +79,7 @@ class CalendarEvents {
 	public static void updateDistances() throws IOException{
 
 		Interface next = new Interface();
+		///Users/niki/git/ICS314CalendarProject/ICS314CalendarProject for the demo this is the directory
 		ArrayList<File> icsFiles = next.askForDirectoryOfIcsFiles();
 		Event[] eventArray = new Event[icsFiles.size()];
 		for (int i = 0; i < icsFiles.size(); i++){
