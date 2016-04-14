@@ -5,8 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.File;
 
 public class Interface {
@@ -72,14 +70,14 @@ public class Interface {
 	public boolean askToUpdateDistances() {
 		boolean updateDistances = false;
 		boolean unknownResponse = false;
-		String description = "";
-		while (description.equals("") || unknownResponse) {
+		String userInput = "";
+		while (userInput.equals("") || unknownResponse) {
 			System.out.print("Did you want to update distances in existing ICS files? Type YES or NO. NO will let you create ICS files  ");			
-			description = scan.nextLine();
-			if(description.equalsIgnoreCase("YES")){
+			userInput = scan.nextLine();
+			if(userInput.equalsIgnoreCase("YES")){
 				updateDistances = true;
 				unknownResponse = false;
-			}else if(description.equalsIgnoreCase("no")){
+			}else if(userInput.equalsIgnoreCase("no")){
 				updateDistances = false;
 				unknownResponse = false;
 			}else{
@@ -91,17 +89,40 @@ public class Interface {
 	
 	// sets Classification to user specification
 	public void askForClassification(Event event) {
+		
+		
+		boolean addClassification = false;
+		boolean unknownResponse = false;
+		String userInput = "";
+		while (userInput.equals("") || unknownResponse) {
+			System.out.print("Did you want to add CLASSIFICATION to this event? Type YES or NO then press 'ENTER':  ");			
+			userInput = scan.nextLine();
+			if(userInput.equalsIgnoreCase("YES")){
+				addClassification = true;
+				unknownResponse = false;
+			}else if(userInput.equalsIgnoreCase("no")){
+				addClassification = false;
+				unknownResponse = false;
+			}else{
+				unknownResponse = true;
+			}
+		}
+		
+		if (!addClassification){
+			return; // don't have to add if they don't want to
+		}
+		
 		String classification = "";
-		while (classification == "") {
+		while (classification.equals("")) {
 			System.out.println("Choose the Classification level for the event");
 			System.out.print("Enter one of the following, PUBLIC, PRIVATE, or CONFIDENTIAL then press 'ENTER':  ");
 			classification = scan.nextLine();
 			if (classification.equalsIgnoreCase("PUBLIC")) {
-				event.setcla("CLASS:PUBLIC\r\n");
+				event.setClassification("CLASS:PUBLIC\r\n");
 			} else if (classification.equalsIgnoreCase("PRIVATE")) {
-				event.setcla("CLASS:PRIVATE\r\n");
+				event.setClassification("CLASS:PRIVATE\r\n");
 			} else if (classification.equalsIgnoreCase("CONFIDENTIAL")) {
-				event.setcla("CLASS:CONFIDENTIAL\r\n");
+				event.setClassification("CLASS:CONFIDENTIAL\r\n");
 			} else {
 				classification = "";
 				System.out.println("That is not a valid entry.");
@@ -111,6 +132,28 @@ public class Interface {
 	
 	//creates geo position for event using latitude and longitude coordinates
 	public void askForLocation(Event event) { //does not check for exactly 6 digits after decimal place!
+	
+		boolean addLocation = false;
+		boolean unknownResponse = false;
+		String userInput = "";
+		while (userInput.equals("") || unknownResponse) {
+			System.out.print("Did you want to add location to this event? Type YES or NO then press 'ENTER':  ");			
+			userInput = scan.nextLine();
+			if(userInput.equalsIgnoreCase("YES")){
+				addLocation = true;
+				unknownResponse = false;
+			}else if(userInput.equalsIgnoreCase("no")){
+				addLocation = false;
+				unknownResponse = false;
+			}else{
+				unknownResponse = true;
+			}
+		}
+		
+		if (!addLocation){
+			return; // don't have to add if they don't want to
+		}
+		
 		float latitude = 181;
 		float longitude = 181;
 		while (latitude < -180 || latitude > 180) {
@@ -127,8 +170,8 @@ public class Interface {
 				System.out.println("The longitude must be within the range of +/-180 and up to 6 decimals.");
 			}
 		}
-		scan.nextLine();  //clears buffer
-		event.setgeo("GEO:" + latitude + ";" + longitude + "\r\n");
+		scan.nextLine();  //need this to clear buffer 
+		event.setGeograph("GEO:" + latitude + ";" + longitude + "\r\n");
 	}
 	
 	public void askForDescription(Event event) {
@@ -137,17 +180,17 @@ public class Interface {
 			System.out.print("Enter the name of the event then press 'ENTER':  ");
 			description = scan.nextLine();
 			}
-		event.setsm("SUMMARY:" + description + "\r\n");
+		event.setSummary("SUMMARY:" + description + "\r\n");
 		name = description;
 	}
 	
-	public void askForFileName(Event e) {
+	public void askForFileName(Event event) {
 		String tempName = "";
 		while (tempName.equals("")) {
 			System.out.print("Enter the name of the calendar file then press 'ENTER':  ");
 			tempName = scan.nextLine();
 		}
-		e.setFileName(tempName); 
+		event.setFileName(tempName); 
 	}	
 	
 	public static String findTimeZone(String timezone){
@@ -174,11 +217,11 @@ public class Interface {
 		String timezone = "";
 		String tZID = "";
 		while (tZID.equals("")){
-			System.out.print("Which timezone is this taking place-USA only(example: HST, PST):  ");
+			System.out.print("Which timezone is this taking place-USA only(HST, PST, CST, EST, AST, MST, AKST):  ");
 			timezone = scan.next();
 			tZID = Interface.findTimeZone(timezone);
 		}
-		event.settzid(tZID);
+		event.setTimezone(tZID);
 	}
 	
 	public void askForStartTime(Event event) {
@@ -195,7 +238,7 @@ public class Interface {
 			try {
 				mnth = Integer.parseInt(month);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + month + "' is not a valid entry!");
 			}
 		}
 		while (dy == null || dy < 1 || dy > 31) {
@@ -204,7 +247,7 @@ public class Interface {
 			try {
 				dy = Integer.parseInt(day);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + day + "' is not a valid entry!");
 			}
 		}
 		while (yr == null || yr < 1000 || yr > 9999) {
@@ -213,7 +256,7 @@ public class Interface {
 			try {
 				yr = Integer.parseInt(year);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + year + "' is not a valid entry!");
 			}
 		}
 		while (tm == null || tm < 0 || tm > 2400) {
@@ -222,11 +265,11 @@ public class Interface {
 			try {
 				tm = Integer.parseInt(time);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + time + "' is not a valid entry!");
 			}
 		}
 		start = year + month + day + "T" + time + "00";
-		event.setstrt("DTSTART;TZID" + event.gettzid() + start + "\r\n");
+		event.setStart("DTSTART;TZID" + event.getTimezone() + start + "\r\n");
 	}
 	
 	public void askForEndTime(Event event) {
@@ -243,7 +286,7 @@ public class Interface {
 			try {
 				mnth = Integer.parseInt(month);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + month + "' is not a valid entry!");
 			}
 		}
 		while (dy == null || dy < 1 || dy > 31) {
@@ -252,7 +295,7 @@ public class Interface {
 			try {
 				dy = Integer.parseInt(day);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + day + "' is not a valid entry!");
 			}
 		}
 		while (yr == null || yr < 1000 || yr > 9999) {
@@ -260,8 +303,8 @@ public class Interface {
 			year = scan.next();
 			try {
 				yr = Integer.parseInt(year);
-			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+			} catch (NumberFormatException numberFormatException) {
+				System.out.println("'" + year + "' is not a valid entry!");
 			}
 		}
 		while (tm == null || tm < 0 || tm > 2400) {
@@ -270,18 +313,20 @@ public class Interface {
 			try {
 				tm = Integer.parseInt(time);
 			} catch (NumberFormatException e) {
-				System.out.println("This is not a valid entry!");
+				System.out.println("'" + time + "' is not a valid entry!");
 			}
 		}
+		
+		scan.nextLine(); // clear the buffer
 		end = year + month + day + "T" + time + "00";
-		event.setnd("DTEND;TZID" + event.gettzid() + end + "\r\n");
+		event.setEnd("DTEND;TZID" + event.getTimezone() + end + "\r\n");
 	}
 	
 	public void getDStamp(Event event){
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		DateFormat timeFormat = new SimpleDateFormat("HHmmss");
 		Date date = new Date();
-		event.setstmp("DTSTAMP:" + dateFormat.format(date)+ "T" + timeFormat.format(date) + "Z\r\n");
+		event.setTimeStamp("DTSTAMP:" + dateFormat.format(date)+ "T" + timeFormat.format(date) + "Z\r\n");
 	}
 	
 //	Your system will compute the great circle distance, in statue miles and kilometers, from the location of EventN to EventNplusOne, and record that in the comment field of EventN.
@@ -294,30 +339,52 @@ public class Interface {
 		String latitude1, longitude1, 
 			   latitude2, longitude2;
 		
-		String line = new String();
+		// get the coordinates out of the two events
+		
+		String geo1 = new String();
+		String geo2 = new String();
 		int  i = 0;
-		double lat1, lon1, lat2, lon2, 
-			   distance, 
-			   radianConverter = 3.14159/180, 
-			   haversinea;
+		double lat1, lon1, lat2, lon2;
+
 	
-		line = event1.getGeo();
+		// cannot calculate unless both geos are there
+		
+		geo1 = event1.getGeograph();
+		if (geo1 == null || geo1.isEmpty()){
+			event1.setComment("COMMENT: Cannot calculate Great Circle Distance from this event to the next because no GEO set on this event \r\n");
+			return;
+		}
+		
+		geo2 = event2.getGeograph();
+		if (geo2 == null || geo2.isEmpty()){
+			event1.setComment("COMMENT: Cannot calculate Great Circle Distance from this event to the next because no GEO set on the next event \r\n");
+			return;
+		}
+		
 		//ignore ';' from string
-		i = line.indexOf(';');
-		latitude1 = line.substring(4, i-1); 
-		longitude1 = line.substring(i+1, line.length()-1);
+		i = geo1.indexOf(';');
+		latitude1 = geo1.substring(4, i-1); 
+		longitude1 = geo1.substring(i+1, geo1.length()-1);
 		
-		line = event2.getGeo();
 		//ignore ';' from string
-		i = line.indexOf(';');
-		latitude2 = line.substring(4, i-1);
-		longitude2 = line.substring(i+1, line.length()-1);
+		i = geo2.indexOf(';');
+		latitude2 = geo2.substring(4, i-1);
+		longitude2 = geo2.substring(i+1, geo2.length()-1);
 		
-			lat1 = Double.parseDouble(latitude1);
-		
+		lat1 = Double.parseDouble(latitude1);
 		lon1 = Double.parseDouble(longitude1);
 		lat2 = Double.parseDouble(latitude2);
 		lon2 = Double.parseDouble(longitude2);
+		
+		double miles = calculateGreatCircleDistance(lat1, lon1, lat2, lon2);
+		double kilometers = convertMilesToKilometers(miles);
+		event1.setComment("COMMENT:Great Circle Distance from this event to the next: " + miles + " miles or " + kilometers + " in km \r\n");
+	}
+
+	public double calculateGreatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
+		double	   distance, 
+		   radianConverter = 3.14159/180, 
+		   haversinea;
 		lat1 = lat1 * radianConverter;
 		lon1 = lon1 * radianConverter;
 		lat2 = lat2 * radianConverter;
@@ -328,10 +395,11 @@ public class Interface {
 					 Math.cos(lat2) * Math.sin((lon1 - lon2)/2) * Math.sin((lon1 - lon2)/2);
 		//6371000 is the earth's radius
 		distance = 6371000 * 2 * Math.atan2(Math.sqrt(haversinea), Math.sqrt(1 - haversinea));
-		
-		 //set comment; not sure if will set at all or not
-		event1.setcomnt("COMMENT:Great Circle Distance from this event to the next: " + distance + "\r\n");
+		return distance;
 	}
 
+	public double convertMilesToKilometers(double miles){
+		return miles * 1.60934;
+	}
 	
 }

@@ -24,9 +24,8 @@ class CalendarEvents {
 		} else {
 			writeEventFiles();
 		}
-
-
 	}
+	
 	private static void writeEventFiles() throws IOException {
 		boolean addEvent = true;
 		Interface next = new Interface();
@@ -41,13 +40,13 @@ class CalendarEvents {
 			next.askForStartTime(e);
 			next.askForEndTime(e);
 			next.askForLocation(e);
-			
-			
+	
 			writeIcsFile(e);
 			
 			addEvent = next.askForAddAnother();
 		}// end while		
 	}
+	
 	private static void writeIcsFile(Event e) throws IOException {
 			String fileName = e.getFileNameWithExtension();
 			File file = new File(fileName);
@@ -73,15 +72,15 @@ class CalendarEvents {
 
 			// Close the buffer
 			bWriter.close();
-
-
 	}
+	
 	public static void updateDistances() throws IOException{
 
 		Interface next = new Interface();
-		///Users/niki/git/ICS314CalendarProject/ICS314CalendarProject for the demo this is the directory
+		// directory should be similar to this: /Users/niki/git/ICS314CalendarProject/ICS314CalendarProject 
 		ArrayList<File> icsFiles = next.askForDirectoryOfIcsFiles();
 		Event[] eventArray = new Event[icsFiles.size()];
+		//reads in all .ics files and converts back into event objects
 		for (int i = 0; i < icsFiles.size(); i++){
 			File currentIcsFile = icsFiles.get(i);
 			Event e = new Event (currentIcsFile);
@@ -90,6 +89,9 @@ class CalendarEvents {
 	
 		Arrays.sort(eventArray); // uses the comparable in Event to sort
 
+		Event lastEvent = eventArray[eventArray.length-1];
+		lastEvent.setComment("COMMENT: Last event of the day no distance calculated \r\n");
+		writeIcsFile(lastEvent);
 		// Compute Great Circle Distance if multiple events
 		for (int i = 1; i< eventArray.length;i++){
 			Event previousEvent = eventArray[i-1];
