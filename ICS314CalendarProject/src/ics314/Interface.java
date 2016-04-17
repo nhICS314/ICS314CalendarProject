@@ -335,7 +335,7 @@ public class Interface {
 //	But I said that location was optional for events. What if there is only one event? What do you do with the last event of the day? What are you going to do then? You’ll have to think about it and come up with something reasonable.
 	
 	//if more than 1 ics file to compute Great Circle Distance
-	public void greatCircleDist(Event event1, Event event2) { //throws FileNotFoundException
+	public void greatCircleDist(Event event1, Event event2) { 
 		String latitude1, longitude1, 
 			   latitude2, longitude2;
 		
@@ -376,13 +376,13 @@ public class Interface {
 		lat2 = Double.parseDouble(latitude2);
 		lon2 = Double.parseDouble(longitude2);
 		
-		double miles = calculateGreatCircleDistance(lat1, lon1, lat2, lon2);
-		double kilometers = convertMilesToKilometers(miles);
+		double kilometers = calculateGreatCircleDistance(lat1, lon1, lat2, lon2);
+		double miles = convertKilometersToMiles(kilometers);
 		event1.setComment("COMMENT:Great Circle Distance from this event to the next: " + miles + " miles or " + kilometers + " in km \r\n");
 	}
 
-	public double calculateGreatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
-		double	   distance, 
+	public static double calculateGreatCircleDistance(double lat1, double lon1, double lat2, double lon2) {
+		double distance, 
 		   radianConverter = 3.14159/180, 
 		   haversinea;
 		lat1 = lat1 * radianConverter;
@@ -393,13 +393,13 @@ public class Interface {
 		//compute distance
 		haversinea = Math.sin((lat1 - lat2)/2) * Math.sin((lat1 - lat2)/2) + Math.cos(lat1) * 
 					 Math.cos(lat2) * Math.sin((lon1 - lon2)/2) * Math.sin((lon1 - lon2)/2);
-		//6371000 is the earth's radius
-		distance = 6371000 * 2 * Math.atan2(Math.sqrt(haversinea), Math.sqrt(1 - haversinea));
+		//6371 is the earth's radius in km
+		distance = 6371 * 2 * Math.atan2(Math.sqrt(haversinea), Math.sqrt(1 - haversinea));
 		return distance;
 	}
 
-	public double convertMilesToKilometers(double miles){
-		return miles * 1.60934;
+	public double convertKilometersToMiles(double km){
+		return km * 0.621371;
 	}
 	
 }
